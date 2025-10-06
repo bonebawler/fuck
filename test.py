@@ -13,8 +13,9 @@ scaler = joblib.load("scaler.pkl")
 le = joblib.load("label_encoder.pkl")
 
 # Reference columns (same order as during training)
+
 X_columns = [
-    "mass", "year", "recclass", "velocity",
+    "mass (g)", "year", "recclass_encoded", "velocity_km_s",
     "mass_log", "velocity_squared", "momentum",
     "kinetic_energy", "year_modern", "mass_velocity_interaction"
 ]
@@ -85,3 +86,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
