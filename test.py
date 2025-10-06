@@ -42,38 +42,42 @@ def predict():
 
     # Encode recclass
     try:
-        recclass_encoded = le.transform([recclass])[0]
-    except:
-        recclass_encoded = le.transform([le.classes_[0]])[0]  # fallback
-
-    # Compute engineered features
-    mass_log = np.log1p(grams)
-    velocity_squared = velocity ** 2
-    momentum = grams * velocity
-    kinetic_energy = 0.5 * grams * (velocity ** 2)
-    year_modern = 1 if year >= 2000 else 0
-    mass_velocity_interaction = mass_log * velocity
-
-    sample = pd.DataFrame([[
-        grams, year, recclass_encoded, velocity,
-        mass_log, velocity_squared, momentum, kinetic_energy,
-        year_modern, mass_velocity_interaction
-    ]], columns=X_columns)
-
-    sample_scaled = scaler.transform(sample)
-    prediction = xgb_model.predict(sample_scaled)[0]
-
-    result = {
-        "latitude": float(prediction[0]),
-        "longitude": float(prediction[1]),
-        "velocity": velocity,
-        "uncertainty": {
-            "latitude_std": lat_std,
-            "longitude_std": long_std
+        try:
+            recclass_encoded = le.transform([recclass])[0]
+        except:
+            recclass_encoded = le.transform([le.classes_[0]])[0]  # fallback
+    
+        # Compute engineered features
+        mass_log = np.log1p(grams)
+        velocity_squared = velocity ** 2
+        momentum = grams * velocity
+        kinetic_energy = 0.5 * grams * (velocity ** 2)
+        year_modern = 1 if year >= 2000 else 0
+        mass_velocity_interaction = mass_log * velocity
+    
+        sample = pd.DataFrame([[
+            grams, year, recclass_encoded, velocity,
+            mass_log, velocity_squared, momentum, kinetic_energy,
+            year_modern, mass_velocity_interaction
+        ]], columns=X_columns)
+    
+        sample_scaled = scaler.transform(sample)
+        prediction = xgb_model.predict(sample_scaled)[0]
+    
+        result = {
+            "latitude": float(prediction[0]),
+            "longitude": float(prediction[1]),
+            "velocity": velocity,
+            "uncertainty": {
+                "latitude_std": lat_std,
+                "longitude_std": long_std
+            }
         }
-    }
-
-    return jsonify(result)
+    
+        return jsonify(result)
+    except Exception as e:
+        return jsonify(e)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
