@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/predict": {"origins": "*"}})
 
 # ======== Load trained components ========
 xgb_model = joblib.load("xgb_model.pkl")
@@ -76,3 +76,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
