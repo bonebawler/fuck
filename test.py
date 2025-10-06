@@ -3,6 +3,7 @@ from flask_cors import CORS
 import joblib
 import numpy as np
 import pandas as pd
+import builtins 
 
 app = Flask(__name__)
 CORS(app, resources={r"/predict": {"origins": "*"}})
@@ -38,10 +39,10 @@ def predict():
             return jsonify({"error": "No JSON data received"}), 400
 
         # Parse and validate inputs
-        velocity = float(data.get('velocity', 0))
-        mass = float(data.get('mass', 0))
-        meteor_type = str(data.get('type_meteor', 'H5'))
-        year = int(data.get('year', 1950))
+        velocity = builtins.float(data.get('velocity') or 0)
+        mass = builtins.float(data.get('mass') or 0)
+        meteor_type = str(data.get('type_meteor') or 'H5')
+        year = builtins.int(data.get('year') or 1950)
 
         # Encode meteorite class (recclass)
         try:
@@ -81,9 +82,10 @@ def predict():
 
     except Exception as e:
         # Catch any runtime errors and return JSON
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 400
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
 
